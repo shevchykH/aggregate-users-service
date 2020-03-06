@@ -13,18 +13,27 @@ USERS_EVENTS_COUNT = USER_COUNT * EVENT_COUNT
 
 
 def create_initial_users():
-    return UserFactory.create_batch(USER_COUNT)
+    UserFactory.create_batch(USER_COUNT)
 
 
 def create_initial_events():
-    return EventFactory.create_batch(EVENT_COUNT)
+    EventFactory.create_batch(EVENT_COUNT)
+
+
+def set_default_worker_settings(apps, schema_editor):
+    WorkerSettings = apps.get_model('core', 'WorkerSettings')
+    WorkerSettings.objects.create(step=10000, last_checked_id=0)
 
 
 def create_users_events_data(apps, schema_editor):
     RawData = apps.get_model('core', 'RawData')
-    users = create_initial_users()
-    events = create_initial_events()
-    users_events = itertools.product(users, events)
+    User = apps.get_model('core', 'User')
+    Event = apps.get_model('core', 'Event')
+    create_initial_users()
+    create_initial_events()
+    user_qs = User.objects.filter(pk__range=(0, USER_COUNT))
+    event_qs = Event.objects.filter(pk__range=(0, EVENT_COUNT))
+    users_events = itertools.product(user_qs, event_qs)
     for i in range(0, USERS_EVENTS_COUNT, BULK_COUNT):
         rows = []
         for j in range(BULK_COUNT):
@@ -42,5 +51,8 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(
             create_users_events_data, reverse_code=migrations.RunPython.noop
+        ),
+        migrations.RunPython(
+            set_default_worker_settings, reverse_code=migrations.RunPython.noop
         ),
     ]

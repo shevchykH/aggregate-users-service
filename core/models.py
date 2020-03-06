@@ -72,5 +72,5 @@ class SingletonModel(models.Model):
 
 
 class WorkerSettings(SingletonModel):
-    step = models.IntegerField(default=1000)
+    step = models.IntegerField()
     last_checked_id = models.IntegerField()

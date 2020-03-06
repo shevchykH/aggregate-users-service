@@ -43,8 +43,8 @@ class Migration(migrations.Migration):
             name='WorkerSettings',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('step', models.IntegerField(default=10000)),
-                ('last_checked_id', models.IntegerField(default=0)),
+                ('step', models.IntegerField()),
+                ('last_checked_id', models.IntegerField()),
             ],
             options={
                 'abstract': False,
